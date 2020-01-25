@@ -1,29 +1,99 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
+    <Search @onNewCity="addCity" @onDelete="onDelete" />
+    <Cities :weatherList="weathers" @onDelete="onDelete" />
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-import HelloWorld from './components/HelloWorld.vue';
+import { Component, Vue } from 'vue-property-decorator'
+import Cities from './components/Cities.vue'
+import Search from '@/components/Search.vue'
+import { City } from '@/models/City.ts'
+import { getCities, registerCity } from '@/services/Persistance'
+import { OpenWeather } from '@/models/OpenWeather'
+import * as OpenWeatherService from '@/services/Weather'
 
 @Component({
   components: {
-    HelloWorld,
+    Cities,
+    Search
   },
 })
-export default class App extends Vue {}
-</script>
+export default class App extends Vue {
+    weathers: Array<OpenWeather> = []
 
+    created() {
+        this.updateCities()
+    }
+
+    onDelete(cityId: number) {
+        registerCity(cityId, true)
+        this.weathers = this.weathers.filter((item) => item.id !== cityId)
+    }
+
+    async addCity(weather: OpenWeather) {
+      this.weathers.push(weather)
+    }
+
+    async updateCities () {
+        const cities = getCities()
+        this.weathers = []
+        for (let city of cities) {
+            const intCity = parseInt(city)
+            const weather: OpenWeather = await OpenWeatherService.getById(intCity)
+            this.weathers.push(weather)
+        }
+    }
+}
+</script>
 <style lang="scss">
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-image: url(./assets/background.png);
+  background-color: #f3fcff;
+}
+
+body,
+input {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+input {
+  border-radius: 0;
+  -webkit-appearance: none;
+}
+
+.footer {
+  height: 50px;
+}
+
+footer {
+  color: #ffffff;
+  font-size: .8em;
+  background-color: #09101c40;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  min-height: 100%;
+  min-height: 100%;
+  margin-bottom: -50px;
+  padding-top: 1em;
+  padding-bottom: 5em;
 }
 </style>
