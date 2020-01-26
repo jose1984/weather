@@ -3,7 +3,7 @@
         <input type="search" class="search__input"
             @input.prevent="search"
             v-model="searchText"
-            placeholder="Buscar una nueva ciudad...">
+            placeholder="Nueva ciudad...">
         <div class="search__result" v-if="result">
             <Weather :weather="result" :registered="registered" @onRegister="onRegister" @onDelete="onDelete" />
         </div>
