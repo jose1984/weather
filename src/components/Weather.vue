@@ -11,8 +11,8 @@
         
         <div class="weather__feels-like">Sensación térmica: {{ feelsLike }}°C</div>
         <div class="weather__humidity">Humedad: {{ humidity }}%</div>
-        <div class="weather__sunrise">Amanece: {{ sunrise.toLocaleTimeString() }}</div>
-        <div class="weather__sunset">Atardece: {{ sunset.toLocaleTimeString() }}</div>
+        <div class="weather__sunrise">🌅 {{ sunrise.toLocaleTimeString() }}</div>
+        <div class="weather__sunset">🌄 {{ sunset.toLocaleTimeString() }}</div>
 
         <div class="weather__add-button" v-show="!registered">
             <button class="weather__button button-primary" @click.prevent="$emit('onRegister', weather.id)">Añadir</button>
@@ -21,6 +21,8 @@
         <div class="weather__del-button" v-show="registered">
             <button class="weather__button button-danger" @click.prevent="$emit('onDelete', weather.id)">Quitar</button>
         </div>
+
+        <div class="weather__last-update" @click.prevent="updateCity">Actualizado a las: {{ lastUpdate.toLocaleTimeString() }}</div>
     </div>
 </template>
 <script lang="ts">
@@ -49,9 +51,10 @@ export default class Weather extends Vue {
     sunset: Date = new Date(0)
     description: string = ''
     img: string = ''
+    lastUpdate : Date = new Date()
 
     async created() {
-        this.scheduler = setInterval(this.updateCities, INTERVAL)
+        this.scheduler = setInterval(this.updateCity, INTERVAL)
         this.renderData(this.weather)
     }
 
@@ -59,18 +62,22 @@ export default class Weather extends Vue {
         clearInterval(this.scheduler)
     }
 
-    async updateCities () {
+    async updateCity () {
         const weather: OpenWeather = await OpenWeatherService.getById(this.weather.id)
         this.renderData(weather)
     }
 
     renderData (weather: OpenWeather) {
+        this.lastUpdate = new Date()
+
         this.name = weather.name
         this.countryCode = weather.sys.country
         this.temperature = Math.round(weather.main.temp)
         this.feelsLike = Math.round(weather.main.feels_like)
         this.humidity = Math.round(weather.main.humidity)
+        this.sunrise = new Date(0)
         this.sunrise.setUTCSeconds(weather.sys.sunrise)
+        this.sunset = new Date(0)
         this.sunset.setUTCSeconds(weather.sys.sunset)
         this.description = weather.weather[0].description
         this.img = getImageUrl(weather)
@@ -126,6 +133,22 @@ export default class Weather extends Vue {
         padding-bottom: .5em;
         width: 100%;
         font-size: 1.5em;
+    }
+
+    &__last-update {
+        text-align: right;
+        font-size: .6em;
+        font-style: italic;
+        color: #aaa;
+        cursor: pointer;
+        margin-top: 1rem;
+
+        &:after {
+            content: '🔁';
+            font-size: 1rem;
+            font-style: normal;
+            margin-left: .5em;
+        }
     }
 
     .button {
