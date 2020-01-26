@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <div id="background-fixed"></div>
     <Search @onNewCity="addCity" @onDelete="onDelete" />
     <Cities :weatherList="weathers" @onDelete="onDelete" />
   </div>
@@ -57,15 +58,6 @@ html, body {
   box-sizing: border-box;
 }
 
-body {
-  background-attachment: fixed;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-image: url(./assets/background.png);
-  background-color: #f3fcff;
-}
-
 body,
 input {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -95,5 +87,18 @@ footer {
   margin-bottom: -50px;
   padding-top: 1em;
   padding-bottom: 5em;
+}
+
+#background-fixed {
+  position: fixed;
+  z-index: -2;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-image: url(./assets/background.png);
 }
 </style>
