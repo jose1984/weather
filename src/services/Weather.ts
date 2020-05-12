@@ -4,7 +4,7 @@ import { OpenWeather } from '@/models/OpenWeather'
 const UNITS = 'metric'
 const API_URL = 'https://api.openweathermap.org'
 const API_VERSION = '2.5'
-const API_KEY = 'e1f931b737580e4839dfba8e99117d64'
+const API_KEY = process.env.VUE_APP_OPENWHEATHERMAP_API_KEY
 const API_LANG = 'es'
 
 export function getByCityName (city: string): Promise<OpenWeather> {
