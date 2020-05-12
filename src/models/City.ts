@@ -1,13 +1,13 @@
 export class City {
-    name: string = '';
-    countryCode: string = '';
+    name = ''
+    countryCode = ''
 
     constructor(name : string, countryCode : string) {
-        this.name = name;
-        this.countryCode = countryCode;
+        this.name = name
+        this.countryCode = countryCode
     }
 
     toString() {
-        return `${this.name},${this.countryCode}`;
+        return `${this.name},${this.countryCode}`
     }
 }

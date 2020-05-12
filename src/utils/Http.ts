@@ -1,12 +1,10 @@
-export async function http<T>(
+export async function get<T>(
   request: RequestInfo
 ): Promise<T> {
-  return fetch(request)
-    .then((response: any) => {
-      if (!response.ok) {
-          return Promise.reject(response.statusText)
-      }
-      return response
-    })
-    .then((response: Body) => response.json() as Promise<T>)
+  const response: Response = await fetch(request)
+  if (!response.ok) {
+    return Promise.reject(response.statusText)
+  }
+  const data: T = await response.json()
+  return data
 }

@@ -4,6 +4,13 @@
             @input.prevent="search"
             v-model="searchText"
             placeholder="Nueva ciudad...">
+        
+        <div class="search__edit">
+            <a @click="toggleEditMode">
+                <template v-if="editMode">Hecho</template>
+                <template v-else>Editar</template>
+            </a>
+        </div>
         <div class="search__result" v-if="result">
             <Weather :weather="result" :registered="registered" @onRegister="onRegister" @onDelete="onDelete" />
         </div>
@@ -19,6 +26,8 @@ import Weather from '@/components/Weather.vue'
 import { OpenWeather } from '@/models/OpenWeather'
 import { registerCity, isRegisteredCity } from '@/services/Persistance'
 
+const DEBOUNCE_TIMEOUT = 1e3
+
 @Component({
     name: 'Search',
     components: {
@@ -26,12 +35,13 @@ import { registerCity, isRegisteredCity } from '@/services/Persistance'
     }
 })
 export default class Search extends Vue {
-    result: any = null
-    registered: boolean = false
-    searchText: string = ''
-    isLoading: boolean = false
+    result: OpenWeather | null = null
+    registered = false
+    searchText = ''
+    isLoading = false
+    editMode = false
 
-    @debounce(1000, { leading: false })
+    @debounce(DEBOUNCE_TIMEOUT, { leading: false })
     async search() {
         this.result = null
         if (this.searchText) {
@@ -41,16 +51,18 @@ export default class Search extends Vue {
                 this.registered = isRegisteredCity(result.id.toString())
                 this.result = result
             } catch (e) {
-                console.log(e)
+                console.error('Search ->', e)
             }
             this.isLoading = false
         }
     }
 
     onRegister () {
-        registerCity(this.result.id)
-        this.$emit('onNewCity', this.result)
-        this.clearResults()
+        if (this.result) {
+            registerCity(this.result.id)
+            this.$emit('onNewCity', this.result)
+            this.clearResults()
+        }
     }
 
     onDelete (cityId: number) {
@@ -63,6 +75,11 @@ export default class Search extends Vue {
         this.result = null
         this.searchText = ''
     }
+
+    toggleEditMode () {
+        this.editMode = !this.editMode
+        this.$emit('edit')
+    }
 }
 </script>
 <style lang="scss" scoped>
@@ -74,13 +91,20 @@ export default class Search extends Vue {
         padding: .5em 1em;
         font-size: 1.5em;
         width: 100%;
-        max-width: 500px;
-        box-shadow: 0 0 6px 0 rgba(0, 0, 0, .39);
-        border-radius: 3px;
+        box-shadow: 0 0 6px 0 rgba(0, 0, 0, .26);
+        border-radius: 1px;
     }
 
     &__result {
         margin-top: 1em;
+    }
+
+    &__edit {
+        color: white;
+        font-size: 1.5em;
+        text-align: right;
+        margin-top: 1em;
+        cursor: pointer;
     }
 }
 </style>

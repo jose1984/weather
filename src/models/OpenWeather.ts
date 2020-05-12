@@ -1,3 +1,5 @@
+
+//eslint-disable-next-line
 declare interface Coord {
     lon: number;
     lat: number;

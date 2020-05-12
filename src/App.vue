@@ -1,8 +1,8 @@
 <template>
   <div id="app">
     <div id="background-fixed"></div>
-    <Search @onNewCity="addCity" @onDelete="onDelete" />
-    <Cities :weatherList="weathers" @onDelete="onDelete" />
+    <Search @onNewCity="addCity" @edit="editMode = !editMode" @onDelete="onDelete" />
+    <Cities :weatherList="weathers" @onDelete="onDelete" :editMode="editMode" />
   </div>
 </template>
 
@@ -10,7 +10,6 @@
 import { Component, Vue } from 'vue-property-decorator'
 import Cities from './components/Cities.vue'
 import Search from '@/components/Search.vue'
-import { City } from '@/models/City.ts'
 import { getCities, registerCity } from '@/services/Persistance'
 import { OpenWeather } from '@/models/OpenWeather'
 import * as OpenWeatherService from '@/services/Weather'
@@ -23,6 +22,7 @@ import * as OpenWeatherService from '@/services/Weather'
 })
 export default class App extends Vue {
     weathers: Array<OpenWeather> = []
+    editMode = false
 
     created() {
         this.updateCities()
@@ -40,7 +40,7 @@ export default class App extends Vue {
     async updateCities () {
         const cities = getCities()
         this.weathers = []
-        for (let city of cities) {
+        for (const city of cities) {
             const intCity = parseInt(city)
             const weather: OpenWeather = await OpenWeatherService.getById(intCity)
             this.weathers.push(weather)
@@ -54,8 +54,15 @@ html, body {
   margin: 0;
 }
 
-* {
+html {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
   box-sizing: border-box;
+}
+*, *:before, *:after {
+  -webkit-box-sizing: inherit;
+  -moz-box-sizing: inherit;
+  box-sizing: inherit;
 }
 
 body,
@@ -99,6 +106,6 @@ footer {
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
-  background-image: url(./assets/background.png);
+  background-image: url(./assets/background.jpg);
 }
 </style>

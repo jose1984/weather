@@ -1,5 +1,8 @@
 <template>
     <div class="weather">
+        <div class="weather__del-button" v-show="registered && editMode">
+            <button class="weather__button button-danger" @click.prevent="$emit('onDelete', weather.id)">Quitar</button>
+        </div>
         <div class="weather__city">{{ name }}, {{ countryCode }}</div>
         <div class="weather__info"><span>{{ description }}</span></div>
         <div class="weather__weather">
@@ -11,15 +14,11 @@
         
         <div class="weather__feels-like">Sensación térmica: {{ feelsLike }}°C</div>
         <div class="weather__humidity">Humedad: {{ humidity }}%</div>
-        <div class="weather__sunrise">🌅 {{ sunrise.toLocaleTimeString() }}</div>
-        <div class="weather__sunset">🌄 {{ sunset.toLocaleTimeString() }}</div>
+        <div class="weather__sunrise">🌅 {{ formatAMPM(sunrise) }}</div>
+        <div class="weather__sunset">🌄 {{ formatAMPM(sunset) }}</div>
 
         <div class="weather__add-button" v-show="!registered">
             <button class="weather__button button-primary" @click.prevent="$emit('onRegister', weather.id)">Añadir</button>
-        </div>
-
-        <div class="weather__del-button" v-show="registered">
-            <button class="weather__button button-danger" @click.prevent="$emit('onDelete', weather.id)">Quitar</button>
         </div>
 
         <div class="weather__last-update" @click.prevent="updateCity">Actualizado a las: {{ lastUpdate.toLocaleTimeString() }}</div>
@@ -31,7 +30,7 @@ import { OpenWeather } from '@/models/OpenWeather'
 import { getImageUrl } from '@/services/Weather'
 import * as OpenWeatherService from '@/services/Weather'
 
-const INTERVAL: number = 60000
+const INTERVAL = 6e4
 
 @Component({
     name: 'Weather'
@@ -40,18 +39,19 @@ export default class Weather extends Vue {
 
     @Prop({ required: true }) weather!: OpenWeather
     @Prop({ default: true }) registered!: boolean
+    @Prop() editMode = false
     scheduler!: number
 
-    name: string = ''
-    countryCode: string = ''
-    temperature: number = 0
-    feelsLike: number = 0
-    humidity: number = 0
+    name = ''
+    countryCode = ''
+    temperature = 0
+    feelsLike = 0
+    humidity = 0
     sunrise: Date = new Date(0)
     sunset: Date = new Date(0)
-    description: string = ''
-    img: string = ''
-    lastUpdate : Date = new Date()
+    description = ''
+    img = ''
+    lastUpdate = new Date()
 
     async created() {
         this.scheduler = setInterval(this.updateCity, INTERVAL)
@@ -82,14 +82,26 @@ export default class Weather extends Vue {
         this.description = weather.weather[0].description
         this.img = getImageUrl(weather)
     }
+
+    
+    formatAMPM(date: Date) {
+        let hours = date.getHours()
+        let minutes: string | number = date.getMinutes()
+        const ampm = hours >= 12 ? 'pm' : 'am'
+        hours = hours % 12
+        hours = hours ? hours : 12
+        minutes = minutes < 10 ? '0'+minutes : minutes
+        const strTime = hours + ':' + minutes + ' ' + ampm
+        return strTime
+    }
 }
 </script>
 <style lang="scss" scoped>
 .weather {
     background-color: white;
     padding: 2em;
-    box-shadow: 0 0 6px 0 rgba(0, 0, 0, .39);
-    border-radius: 1%;
+    box-shadow: 0 0 6px 0 rgba(0, 0, 0, .26);
+    border-radius: 1px;
 
     &__city,
     &__info {
@@ -121,9 +133,12 @@ export default class Weather extends Vue {
         }
     }
 
-    &__add-button,
-    &__del-button {
+    &__add-button {
         margin-top: 2em;
+    }
+
+    &__del-button {
+        margin-bottom: 2em;
     }
 
     &__button {
@@ -152,14 +167,28 @@ export default class Weather extends Vue {
     }
 
     .button {
+        &-primary,
+        &-danger {
+            cursor: pointer;
+            font-weight: bold;
+        }
+
         &-primary {
+            color: lightgreen;
             background-color: green;
+
+            &:hover {
+                color: #e1ffe1;
+            }
         }
 
         &-danger {
             color: #ffcaca;
-            font-weight: bold;
             background-color: #ea0909;
+
+            &:hover {
+                color: #ffeded;
+            }
         }
     }
 }

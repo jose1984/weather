@@ -1,7 +1,7 @@
 <template>
     <div class="cities">
         <div class="cities__wrapper" v-if="weatherList">
-            <Weather class="cities__city" :weather="weather"
+            <Weather class="cities__city" :editMode="editMode" :weather="weather"
                 v-for="weather in weatherList" :key="weather.id"
                 @onDelete="onDelete" />
         </div>
@@ -20,6 +20,7 @@ import { OpenWeather } from '@/models/OpenWeather'
 })
 export default class Cities extends Vue {
     @Prop({default: [], required: false}) weatherList!: Array<OpenWeather>
+    @Prop() editMode = false
 
     onDelete (cityId: number) {
         this.$emit('onDelete', cityId)
