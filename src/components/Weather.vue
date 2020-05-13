@@ -12,10 +12,10 @@
             <img  class="weather-weather__icon" :src="img" :alt="description">
         </div>
         
-        <div class="weather__feels-like">Sensación térmica: {{ feelsLike }}°C</div>
-        <div class="weather__humidity">Humedad: {{ humidity }}%</div>
-        <div class="weather__sunrise">🌅 {{ formatAMPM(sunrise) }}</div>
-        <div class="weather__sunset">🌄 {{ formatAMPM(sunset) }}</div>
+        <div class="weather__feels-like">Sensación térmica: <strong>{{ feelsLike }}°C</strong></div>
+        <div class="weather__humidity">Humedad: <strong>{{ humidity }}%</strong></div>
+        <div class="weather__sunrise">🌅 <strong>{{ formatAMPM(sunrise) }}</strong></div>
+        <div class="weather__sunset">🌄 <strong>{{ formatAMPM(sunset) }}</strong></div>
 
         <div class="weather__add-button" v-show="!registered">
             <button class="weather__button button-primary" @click.prevent="$emit('onRegister', weather.id)">Añadir</button>
