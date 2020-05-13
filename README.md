@@ -1,3 +1,7 @@
+![Build and Deploy](https://github.com/jose1984/weather/workflows/Build%20and%20Deploy/badge.svg)
+
+[Demo](https://weather-josete.web.app/)
+
 # weather
 
 ## Project setup
