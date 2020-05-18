@@ -13,6 +13,7 @@
         </div>
         
         <div class="weather__feels-like">Sensación térmica: <strong>{{ feelsLike }}°C</strong></div>
+        <div class="weather__temp-minmax">Máx/mín hoy: <strong>{{ tempMax }}/{{ tempMin }}°C</strong></div>
         <div class="weather__humidity">Humedad: <strong>{{ humidity }}%</strong></div>
         <div class="weather__sunrise">🌅 <strong>{{ formatAMPM(sunrise) }}</strong></div>
         <div class="weather__sunset">🌄 <strong>{{ formatAMPM(sunset) }}</strong></div>
@@ -45,6 +46,8 @@ export default class Weather extends Vue {
     name = ''
     countryCode = ''
     temperature = 0
+    tempMin = 0
+    tempMax = 0
     feelsLike = 0
     humidity = 0
     sunrise: Date = new Date(0)
@@ -73,6 +76,8 @@ export default class Weather extends Vue {
         this.name = weather.name
         this.countryCode = weather.sys.country
         this.temperature = Math.round(weather.main.temp)
+        this.tempMin = Math.round(weather.main.temp_min)
+        this.tempMax = Math.round(weather.main.temp_max)
         this.feelsLike = Math.round(weather.main.feels_like)
         this.humidity = Math.round(weather.main.humidity)
         this.sunrise = new Date(0)
