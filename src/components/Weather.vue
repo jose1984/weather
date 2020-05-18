@@ -40,8 +40,9 @@ export default class Weather extends Vue {
 
     @Prop({ required: true }) weather!: OpenWeather
     @Prop({ default: true }) registered!: boolean
-    @Prop() editMode = false
-    scheduler!: number
+    @Prop() editMode!: boolean
+    private scheduler!: number
+    private intersectionObserver!: IntersectionObserver
 
     name = ''
     countryCode = ''
@@ -56,17 +57,29 @@ export default class Weather extends Vue {
     img = ''
     lastUpdate = new Date()
 
-    async created() {
-        this.scheduler = setInterval(this.updateCity, INTERVAL)
+    async mounted() {
+        this.intersectionObserver = new IntersectionObserver(this.intersectionHandler);
+        this.intersectionObserver.observe(this.$el)
         this.renderData(this.weather)
+    }
+
+    private intersectionHandler ([entry]: IntersectionObserverEntry[]) {
+        if (entry && entry.isIntersecting) {
+            this.scheduler = setInterval(this.updateCity, INTERVAL)
+        } else {
+            clearInterval(this.scheduler)
+        }
     }
 
     beforeDestroy () {
         clearInterval(this.scheduler)
+        if (this.intersectionObserver) {
+            this.intersectionObserver.disconnect()
+        }
     }
 
     async updateCity () {
-        const weather: OpenWeather = await OpenWeatherService.getById(this.weather.id)
+        const weather = await OpenWeatherService.getById(this.weather.id)
         this.renderData(weather)
     }
 
@@ -89,7 +102,7 @@ export default class Weather extends Vue {
     }
 
     
-    formatAMPM(date: Date) {
+    formatAMPM(date: Date): string {
         let hours = date.getHours()
         let minutes: string | number = date.getMinutes()
         const ampm = hours >= 12 ? 'pm' : 'am'
@@ -103,10 +116,11 @@ export default class Weather extends Vue {
 </script>
 <style lang="scss" scoped>
 .weather {
-    background-color: white;
+    background-color: rgba(0, 0, 0, 0.36);
     padding: 2em;
     box-shadow: 0 0 6px 0 rgba(0, 0, 0, .26);
     border-radius: 1px;
+    color: white;
 
     &__city,
     &__info {
