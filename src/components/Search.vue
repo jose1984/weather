@@ -6,7 +6,7 @@
             placeholder="Nueva ciudad...">
         
         <div class="search__edit">
-            <a @click="toggleEditMode">
+            <a href="#" class="search__edit--link" @click.prevent="$emit('toggleEditMode')">
                 <template v-if="editMode">Hecho</template>
                 <template v-else>Editar</template>
             </a>
@@ -19,9 +19,9 @@
 <script lang="ts">
 /* eslint-disable no-console */
 
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 import { debounce } from 'typescript-debounce-decorator'
-import * as OpenWeatherService from '@/services/Weather'
+import { getByCityName } from '@/services/Weather'
 import Weather from '@/components/Weather.vue'
 import { OpenWeather } from '@/models/OpenWeather'
 import { registerCity, isRegisteredCity } from '@/services/Persistance'
@@ -39,7 +39,7 @@ export default class Search extends Vue {
     registered = false
     searchText = ''
     isLoading = false
-    editMode = false
+    @Prop() editMode!: boolean
 
     @debounce(DEBOUNCE_TIMEOUT, { leading: false })
     async search() {
@@ -47,9 +47,8 @@ export default class Search extends Vue {
         if (this.searchText) {
             this.isLoading = true
             try {
-                const result: OpenWeather = await OpenWeatherService.getByCityName(this.searchText)
-                this.registered = isRegisteredCity(result.id.toString())
-                this.result = result
+                this.result = await getByCityName(this.searchText)
+                this.registered = isRegisteredCity(this.result.id.toString())
             } catch (e) {
                 console.error('Search ->', e)
             }
@@ -75,11 +74,6 @@ export default class Search extends Vue {
         this.result = null
         this.searchText = ''
     }
-
-    toggleEditMode () {
-        this.editMode = !this.editMode
-        this.$emit('edit')
-    }
 }
 </script>
 <style lang="scss" scoped>
@@ -100,11 +94,15 @@ export default class Search extends Vue {
     }
 
     &__edit {
-        color: white;
         font-size: 1.5em;
         text-align: right;
         margin-top: 1em;
-        cursor: pointer;
+
+        &--link {
+            cursor: pointer;
+            color: white;
+            text-decoration: none;
+        }
     }
 }
 </style>

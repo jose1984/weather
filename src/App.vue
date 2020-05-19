@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div id="background-fixed"></div>
-    <Search @onNewCity="addCity" @edit="editMode = !editMode" @onDelete="onDelete" />
+    <Search @onNewCity="addCity" @toggleEditMode="editMode = !editMode" @onDelete="onDelete" :editMode="editMode" />
     <Cities :weatherList="weathers" @onDelete="onDelete" :editMode="editMode" />
   </div>
 </template>
