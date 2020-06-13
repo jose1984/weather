@@ -1,19 +1,22 @@
 <template>
     <div class="search">
-        <input type="search" class="search__input"
-            @input.prevent="search"
-            v-model="searchText"
-            placeholder="Nueva ciudad...">
-        
         <div class="search__edit">
             <a href="#" class="search__edit--link" @click.prevent="$emit('toggleEditMode')">
                 <template v-if="editMode">Hecho</template>
                 <template v-else>Editar</template>
             </a>
         </div>
-        <div class="search__result" v-if="result">
-            <Weather :weather="result" :registered="registered" @onRegister="onRegister" @onDelete="onDelete" />
-        </div>
+        <transition name="search-fade">
+            <input type="search" class="search__input"
+                @input.prevent="search"
+                v-show="editMode"
+                v-model="searchText"
+                placeholder="Nueva ciudad...">
+
+            <div class="search__result" v-if="result">
+                <Weather :weather="result" :registered="registered" @onRegister="onRegister" @onDelete="onDelete" />
+            </div>
+        </transition>
     </div>
 </template>
 <script lang="ts">
@@ -24,7 +27,7 @@ import { debounce } from 'typescript-debounce-decorator'
 import { getByCityName } from '@/services/Weather'
 import Weather from '@/components/Weather.vue'
 import { OpenWeather } from '@/models/OpenWeather'
-import { registerCity, isRegisteredCity } from '@/services/Persistance'
+import { isRegisteredCity } from '@/services/Persistance'
 
 const DEBOUNCE_TIMEOUT = 1e3
 
@@ -58,7 +61,6 @@ export default class Search extends Vue {
 
     onRegister () {
         if (this.result) {
-            registerCity(this.result.id)
             this.$emit('onNewCity', this.result)
             this.clearResults()
         }
@@ -78,7 +80,8 @@ export default class Search extends Vue {
 </script>
 <style lang="scss" scoped>
 .search {
-    padding: 0 1em;
+    backface-visibility: hidden;
+    padding: 1em;
 
     &__input {
         border: none;
@@ -89,19 +92,30 @@ export default class Search extends Vue {
         border-radius: 1px;
     }
 
-    &__result {
-        margin-top: 1em;
+    &__result,
+    &__input {
+        margin-top: 1rem;
     }
 
     &__edit {
         font-size: 1.5em;
         text-align: right;
-        margin-top: 1em;
 
         &--link {
             cursor: pointer;
             color: white;
             text-decoration: none;
+        }
+    }
+
+    &-fade {
+        &-enter-active,
+        &-leave-active {
+            transition: opacity .3s;
+        }
+        &-enter,
+        &-leave-to {
+            opacity: 0;
         }
     }
 }

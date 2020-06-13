@@ -1,7 +1,11 @@
 <template>
   <div id="app">
     <div id="background-fixed"></div>
-    <Search @onNewCity="addCity" @toggleEditMode="editMode = !editMode" @onDelete="onDelete" :editMode="editMode" />
+    <Search
+      @onNewCity="addCity"
+      @toggleEditMode="editMode = !editMode"
+      @onDelete="onDelete"
+      :editMode="editMode" />
     <Cities :weatherList="weathers" @onDelete="onDelete" :editMode="editMode" />
   </div>
 </template>
@@ -34,23 +38,26 @@ export default class App extends Vue {
     }
 
     async addCity(weather: OpenWeather) {
+      registerCity(weather.id)
       this.weathers.push(weather)
     }
 
     async updateCities () {
-        const cities = getCities()
-        this.weathers = []
-        for (const city of cities) {
-            const intCity = parseInt(city)
-            const weather: OpenWeather = await OpenWeatherService.getById(intCity)
-            this.weathers.push(weather)
-        }
+      this.weathers = await Promise.all(
+        getCities().map(async city => {
+          const intCity = parseInt(city)
+          return OpenWeatherService.getById(intCity)
+        })
+      )
+      if (this.weathers && this.weathers.length === 0) {
+        this.editMode = true
+      }
     }
 }
 </script>
 <style lang="scss">
 html, body {
-  height: 100%;
+  height: 100vh;
   margin: 0;
 }
 
@@ -89,10 +96,8 @@ footer {
 }
 
 #app {
-  min-height: 100%;
-  min-height: 100%;
+  min-height: 100vh;
   margin-bottom: -50px;
-  padding-top: 1em;
   padding-bottom: 5em;
 }
 
