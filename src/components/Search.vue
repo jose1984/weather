@@ -7,14 +7,15 @@
             </a>
         </div>
         <transition name="search-fade">
-            <input type="search" class="search__input"
-                @input.prevent="search"
-                v-show="editMode"
-                v-model="searchText"
-                placeholder="Nueva ciudad...">
+            <div v-show="editMode">
+                <input type="search" class="search__input"
+                    @input.prevent="search"
+                    v-model="searchText"
+                    placeholder="Nueva ciudad...">
 
-            <div class="search__result" v-if="result">
-                <Weather :weather="result" :registered="registered" @onRegister="onRegister" @onDelete="onDelete" />
+                <div class="search__result" v-if="result">
+                    <Weather :weather="result" :registered="registered" @onRegister="onRegister" @onDelete="onDelete" />
+                </div>
             </div>
         </transition>
     </div>
