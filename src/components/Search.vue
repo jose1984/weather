@@ -14,7 +14,7 @@
                     placeholder="Nueva ciudad...">
 
                 <div class="search__result" v-if="result">
-                    <Weather :weather="result" :registered="registered" @onRegister="onRegister" @onDelete="onDelete" />
+                    <Weather :weather="result" @onRegister="onRegister" @onDelete="onDelete" />
                 </div>
             </div>
         </transition>
@@ -28,7 +28,6 @@ import { debounce } from 'typescript-debounce-decorator'
 import { getByCityName } from '@/services/Weather'
 import Weather from '@/components/Weather.vue'
 import { OpenWeather } from '@/models/OpenWeather'
-import { isRegisteredCity } from '@/services/Persistance'
 
 const DEBOUNCE_TIMEOUT = 1e3
 
@@ -46,13 +45,12 @@ export default class Search extends Vue {
     @Prop() editMode!: boolean
 
     @debounce(DEBOUNCE_TIMEOUT, { leading: false })
-    async search() {
+    async search(): Promise<void> {
         this.result = null
         if (this.searchText) {
             this.isLoading = true
             try {
                 this.result = await getByCityName(this.searchText)
-                this.registered = isRegisteredCity(this.result.id.toString())
             } catch (e) {
                 console.error('Search ->', e)
             }
@@ -60,20 +58,19 @@ export default class Search extends Vue {
         }
     }
 
-    onRegister () {
+    onRegister (): void {
         if (this.result) {
             this.$emit('onNewCity', this.result)
             this.clearResults()
         }
     }
 
-    onDelete (cityId: number) {
+    onDelete (cityId: number): void {
         this.$emit('onDelete', cityId)
         this.clearResults()
     }
 
-    clearResults () {
-        this.registered = true
+    clearResults (): void {
         this.result = null
         this.searchText = ''
     }

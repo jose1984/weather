@@ -29,6 +29,7 @@
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { OpenWeather } from '@/models/OpenWeather'
 import { getImageUrl } from '@/services/Weather'
+import { isRegisteredCity } from '@/services/Persistance'
 import * as OpenWeatherService from '@/services/Weather'
 
 const INTERVAL = 6e4
@@ -39,7 +40,6 @@ const INTERVAL = 6e4
 export default class Weather extends Vue {
 
     @Prop({ required: true }) weather!: OpenWeather
-    @Prop({ default: true }) registered!: boolean
     @Prop() editMode!: boolean
     private scheduler!: number
     private intersectionObserver!: IntersectionObserver
@@ -56,14 +56,15 @@ export default class Weather extends Vue {
     description = ''
     img = ''
     lastUpdate = new Date()
+    registered = false
 
-    async mounted() {
+    async mounted(): Promise<void> {
         this.intersectionObserver = new IntersectionObserver(this.intersectionHandler);
         this.intersectionObserver.observe(this.$el)
         this.renderData(this.weather)
     }
 
-    private intersectionHandler ([entry]: IntersectionObserverEntry[]) {
+    private intersectionHandler ([entry]: IntersectionObserverEntry[]): void {
         if (entry && entry.isIntersecting) {
             this.scheduler = setInterval(this.updateCity, INTERVAL)
         } else {
@@ -71,19 +72,19 @@ export default class Weather extends Vue {
         }
     }
 
-    beforeDestroy () {
+    beforeDestroy (): void {
         clearInterval(this.scheduler)
         if (this.intersectionObserver) {
             this.intersectionObserver.disconnect()
         }
     }
 
-    async updateCity () {
+    async updateCity (): Promise<void> {
         const weather = await OpenWeatherService.getById(this.weather.id)
         this.renderData(weather)
     }
 
-    renderData (weather: OpenWeather) {
+    renderData (weather: OpenWeather): void {
         this.lastUpdate = new Date()
 
         this.name = weather.name
@@ -99,6 +100,8 @@ export default class Weather extends Vue {
         this.sunset.setUTCSeconds(weather.sys.sunset)
         this.description = weather.weather[0].description
         this.img = getImageUrl(weather)
+
+        this.registered = isRegisteredCity(weather.id.toString())
     }
 
     

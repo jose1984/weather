@@ -19,6 +19,6 @@ export function getById (cityId: number): Promise<OpenWeather> {
     )
 }
 
-export function getImageUrl (weather: OpenWeather) {
+export function getImageUrl (weather: OpenWeather): string {
     return `https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`
 }

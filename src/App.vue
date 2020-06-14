@@ -6,17 +6,22 @@
       @toggleEditMode="editMode = !editMode"
       @onDelete="onDelete"
       :editMode="editMode" />
-    <Cities :weatherList="weathers" @onDelete="onDelete" :editMode="editMode" />
+    <Cities
+      :weatherList="weathers"
+      @onDelete="onDelete" 
+      @onChange="onChange"
+      :editMode="editMode" />
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import Cities from './components/Cities.vue'
+import Cities from '@/components/Cities.vue'
 import Search from '@/components/Search.vue'
 import { getCities, registerCity } from '@/services/Persistance'
 import { OpenWeather } from '@/models/OpenWeather'
 import * as OpenWeatherService from '@/services/Weather'
+import { registerAll } from '@/services/Persistance'
 
 @Component({
   components: {
@@ -28,21 +33,25 @@ export default class App extends Vue {
     weathers: Array<OpenWeather> = []
     editMode = false
 
-    created() {
-        this.updateCities()
+    created(): void {
+      this.updateCities()
     }
 
-    onDelete(cityId: number) {
-        registerCity(cityId, true)
-        this.weathers = this.weathers.filter((item) => item.id !== cityId)
+    onDelete(cityId: number): void {
+      registerCity(cityId, true)
+      this.weathers = this.weathers.filter((item) => item.id !== cityId)
     }
 
-    async addCity(weather: OpenWeather) {
+    onChange (weatherList: Array<OpenWeather>): void {
+      registerAll(weatherList.map(weather => weather.id))
+    }
+
+    async addCity(weather: OpenWeather): Promise<void> {
       registerCity(weather.id)
       this.weathers.push(weather)
     }
 
-    async updateCities () {
+    async updateCities (): Promise<void> {
       this.weathers = await Promise.all(
         getCities().map(async city => {
           const intCity = parseInt(city)

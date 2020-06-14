@@ -8,12 +8,7 @@ jest.mock('@/services/Weather', () => ({
 
 describe('Search.vue', () => {
   test('edit button emits event', () => {
-    const mockMethod = jest.fn()
-    const wrapper = shallowMount(Search, {
-      methods: {
-        toggleEditMode: mockMethod
-      }
-    })
+    const wrapper = shallowMount(Search)
     wrapper.find('a.search__edit--link').trigger('click')
     expect(wrapper.emitted('toggleEditMode')).toBeTruthy()
   })

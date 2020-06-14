@@ -5,12 +5,16 @@ export function getCities (): string[] {
     return localStorageItem ? localStorageItem.split(SEPARATOR) : []
 }
 
-export function isRegisteredCity (cityId: string) {
+export function registerAll (cities: Array<number>): void {
+    localStorage.setItem('cities', cities.join(SEPARATOR))
+}
+
+export function isRegisteredCity (cityId: string): boolean {
     const cities: string[] = getCities()
     return cities.includes(cityId)
 }
 
-export function registerCity (cityId: number, unregister = false) {
+export function registerCity (cityId: number, unregister = false): void {
     let cities: string[] = getCities()
     if (unregister) {
         cities = cities.filter(item => item !== cityId.toString())
