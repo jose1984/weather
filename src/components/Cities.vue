@@ -2,8 +2,8 @@
     <div class="cities">
         <!-- Edit mode draggable -->
         <draggable :list="weatherList" @update="onChange" chosenClass="cities__city--choosen"
-            class="cities__wrapper" v-if="editMode">
-            <Weather class="cities__city" :editMode="editMode" :weather="weather"
+            v-if="editMode">
+            <Weather class="cities__list" :editMode="editMode" :weather="weather"
                 v-for="weather in weatherList" :key="weather.id"
                 @onDelete="onDelete" />
         </draggable>
@@ -49,9 +49,12 @@ export default class Cities extends Vue {
         flex-flow: wrap;
     }
 
+    &__city, &__list {
+        margin: 1em;
+    }
+
     &__city {
         flex: 1 0;
-        margin: 1em;
 
         &--choosen {
             opacity: .3;

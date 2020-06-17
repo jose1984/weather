@@ -1,28 +1,31 @@
 <template>
     <div class="weather">
-        <div class="weather__del-button" v-show="registered && editMode">
-            <button class="weather__button button-danger" @click.prevent="$emit('onDelete', weather.id)">Quitar</button>
+        <div class="weather__edit" v-if="registered" v-show="editMode">
+            <span class="weather__edit-city">{{ name }}, {{ countryCode }} - {{ temperature }}<span class="celsius">°C</span></span>
+            <button class="weather__button weather__edit-del button-danger" @click.prevent="$emit('onDelete', weather.id)">Quitar</button>
         </div>
-        <div class="weather__city">{{ name }}, {{ countryCode }}</div>
-        <div class="weather__info"><span>{{ description }}</span></div>
-        <div class="weather__weather">
-            <div class="weather-weather__temperature">
-                {{ temperature }}<span class="celsius">°C</span>
-            </div>
-            <img  class="weather-weather__icon" :src="img" :alt="description">
-        </div>
-        
-        <div class="weather__feels-like">Sensación térmica: <strong>{{ feelsLike }}°C</strong></div>
-        <div class="weather__temp-minmax">Máx/mín hoy: <strong>{{ tempMax }}/{{ tempMin }}°C</strong></div>
-        <div class="weather__humidity">Humedad: <strong>{{ humidity }}%</strong></div>
-        <div class="weather__sunrise">🌅 <strong>{{ formatAMPM(sunrise) }}</strong></div>
-        <div class="weather__sunset">🌄 <strong>{{ formatAMPM(sunset) }}</strong></div>
-
-        <div class="weather__add-button" v-show="!registered">
+        <div class="weather__add-button" v-else>
             <button class="weather__button button-primary" @click.prevent="$emit('onRegister', weather.id)">Añadir</button>
         </div>
 
-        <div class="weather__last-update" @click.prevent="updateCity">Actualizado a las: {{ lastUpdate.toLocaleTimeString() }}</div>
+        <div class="weather-content" v-show="!editMode">
+            <div class="weather__city">{{ name }}, {{ countryCode }}</div>
+            <div class="weather__info"><span>{{ description }}</span></div>
+            <div class="weather__weather">
+                <div class="weather-weather__temperature">
+                    {{ temperature }}<span class="celsius">°C</span>
+                </div>
+                <img  class="weather-weather__icon" :src="img" :alt="description">
+            </div>
+            
+            <div class="weather__feels-like">Sensación térmica: <strong>{{ feelsLike }}°C</strong></div>
+            <div class="weather__temp-minmax">Máx/mín hoy: <strong>{{ tempMax }}/{{ tempMin }}°C</strong></div>
+            <div class="weather__humidity">Humedad: <strong>{{ humidity }}%</strong></div>
+            <div class="weather__sunrise">🌅 <strong>{{ formatAMPM(sunrise) }}</strong></div>
+            <div class="weather__sunset">🌄 <strong>{{ formatAMPM(sunset) }}</strong></div>
+
+            <div class="weather__last-update" @click.prevent="updateCity">Actualizado a las: {{ lastUpdate.toLocaleTimeString() }}</div>
+        </div>
     </div>
 </template>
 <script lang="ts">
@@ -125,6 +128,25 @@ export default class Weather extends Vue {
     border-radius: 1px;
     color: white;
 
+    &-content {
+        margin-top: 2em;
+    }
+
+    &__edit {
+        display: flex;
+        align-items: center;
+
+        &-city {
+            flex: 1 0;
+            font-size: 1.4em;
+        }
+
+        &-del {
+            flex: 0 0;
+            margin-left: 1em;
+        }
+    }
+
     &__city,
     &__info {
         text-align: center;
@@ -153,14 +175,6 @@ export default class Weather extends Vue {
         &__icon {
             flex: 0 0;
         }
-    }
-
-    &__add-button {
-        margin-top: 2em;
-    }
-
-    &__del-button {
-        margin-bottom: 2em;
     }
 
     &__button {

@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-    <div id="background-fixed"></div>
     <Search
       @onNewCity="addCity"
       @toggleEditMode="editMode = !editMode"
@@ -86,6 +85,12 @@ input {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+body {
+  background-image: linear-gradient(to top, #09203f 0%, #537895 100%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
 input {
   border-radius: 0;
   -webkit-appearance: none;
@@ -108,18 +113,5 @@ footer {
   min-height: 100vh;
   margin-bottom: -50px;
   padding-bottom: 5em;
-}
-
-#background-fixed {
-  position: fixed;
-  z-index: -2;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-image: url(./assets/background.jpg);
 }
 </style>
